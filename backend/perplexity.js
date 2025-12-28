@@ -12,26 +12,56 @@ You must classify urgency into exactly one of these:
 
 Rules:
 - Never prescribe antibiotics, steroids, or controlled drugs.
-- Provide only safe guidance (hydration, rest, ORS advice, paracetamol general guidance).
+- Provide only safe advice (hydration, rest, ORS advice, paracetamol general guidance).
 - Always include warning signs to go to hospital immediately.
-- End with: “এটি চিকিৎসকের বিকল্প নয়।”
+- End with: "এটি চিকিৎসকের বিকল্প নয়।"
 
-Output format must be:
+✅ VERY IMPORTANT OUTPUT FORMAT:
+You MUST output two sections exactly like this:
 
-জরুরিতা: <one>
+FULL_ADVICE:
+জরুরিতা: <one of the 4 classes above>
 সম্ভাব্য কারণ: <1-2 possibilities>
-আপনি এখন কী করবেন: <steps>
-জরুরি সতর্কতা: <warning signs>
+আপনি এখন কী করবেন: <3-6 short steps>
+জরুরি সতর্কতা: <danger signs>
 ঔষধ (যদি নিরাপদ হয়): <safe suggestions>
 নোট: এটি চিকিৎসকের বিকল্প নয়।
+
+SMS_SUMMARY:
+A single Bangla SMS under 280 characters.
+Must include:
+- urgency word
+- 2-3 steps
+- 1 danger sign
+- safe medicine suggestion if appropriate
+End with: "এটি চিকিৎসকের বিকল্প নয়।"
   `.trim();
 }
 
+function splitAdvice(text) {
+  const fullMatch = text.match(/FULL_ADVICE:\s*([\s\S]*?)SMS_SUMMARY:/i);
+  const smsMatch = text.match(/SMS_SUMMARY:\s*([\s\S]*)/i);
+
+  const fullAdvice = fullMatch ? fullMatch[1].trim() : (text || "").trim();
+  let smsSummary = smsMatch ? smsMatch[1].trim() : "";
+
+  if (!smsSummary) smsSummary = fullAdvice.slice(0, 260);
+
+  // Keep SMS small so Twilio doesn't split too much
+  if (smsSummary.length > 280) {
+    smsSummary = smsSummary.slice(0, 275) + "...";
+  }
+
+  return { fullAdvice, smsSummary };
+}
+
+/**
+ * Returns:
+ * { fullAdvice, smsSummary }
+ */
 async function getAiDoctorOpinion({ symptomsBn }) {
   const apiKey = process.env.PERPLEXITY_API_KEY;
-  if (!apiKey) {
-    throw new Error("Missing PERPLEXITY_API_KEY in .env");
-  }
+  if (!apiKey) throw new Error("Missing PERPLEXITY_API_KEY in .env");
 
   const url = "https://api.perplexity.ai/chat/completions";
 
@@ -41,17 +71,17 @@ async function getAiDoctorOpinion({ symptomsBn }) {
       { role: "system", content: buildSystemPrompt() },
       {
         role: "user",
-        content: `রোগীর উপসর্গ (Bangla): ${symptomsBn}\n\nদয়া করে শুধু উপরের ফরম্যাটে উত্তর দিন।`
+        content: `রোগীর উপসর্গ (Bangla): ${symptomsBn}\n\nউপরের FULL_ADVICE এবং SMS_SUMMARY ফরম্যাট মেনে উত্তর দিন।`
       }
     ],
     temperature: 0.2,
-    max_tokens: 500
+    max_tokens: 700
   };
 
   const resp = await fetch(url, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify(body)
@@ -63,8 +93,9 @@ async function getAiDoctorOpinion({ symptomsBn }) {
   }
 
   const data = await resp.json();
-  const text = data?.choices?.[0]?.message?.content?.trim() || "দুঃখিত, উত্তর তৈরি করা যায়নি।";
-  return text;
+  const raw = data?.choices?.[0]?.message?.content?.trim() || "";
+
+  return splitAdvice(raw);
 }
 
 module.exports = { getAiDoctorOpinion };
