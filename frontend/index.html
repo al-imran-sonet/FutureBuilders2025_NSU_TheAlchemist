@@ -5,29 +5,29 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ShasthoBondhu</title>
 
-  <!-- ✅ Fonts for your design -->
+  <!-- ✅ Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet">
 
-  <!-- ✅ Your new healthcare theme -->
+  <!-- ✅ Theme CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <header class="hero">
     <div class="container">
-      <div class="heroTitle">ShasthoBondhu</div>
+      <div class="heroTitle">ShasthyaSathi</div>
       <div class="heroSub">
-        AI ডাক্তার পরামর্শ + ওষুধ ডেলিভারি (ওয়েব + SMS) <br />
-        পাহাড়ি অঞ্চল ও গ্রামীণ মানুষের জন্য কম ইন্টারনেটেও কাজ করবে
+        AI ডাক্তার পরামর্শ + ওষুধ ডেলিভারি  <br />
+      
       </div>
     </div>
   </header>
 
   <div class="container fadeInUp">
 
-    <!-- AI Opinion -->
+    <!-- ✅ AI Opinion (NO VIDEO HERE NOW) -->
     <div class="card">
       <div class="cardTitle">
         <h2>🩺 AI ডাক্তার পরামর্শ</h2>
@@ -61,7 +61,7 @@
       </div>
     </div>
 
-    <!-- Medicine Order -->
+    <!-- ✅ Medicine Order -->
     <div class="card">
       <div class="cardTitle">
         <h2>💊 ওষুধ অর্ডার</h2>
@@ -113,22 +113,44 @@
       <div id="orderMsg" class="small" style="margin-top:10px;"></div>
     </div>
 
-    <!-- SMS Info -->
+    <!-- ✅ SMS Info (VIDEO IS HERE ON THE RIGHT SIDE) -->
     <div class="card">
       <div class="cardTitle">
         <h2>📩 ইন্টারনেট নেই?</h2>
         <span class="badge">SMS Mode</span>
       </div>
 
-      <p class="small">
-        SMS পাঠান:<br/>
-        <b>HELP</b> আপনার সমস্যা লিখে পাঠান (উদাহরণ: <b>HELP</b> জ্বর ৩ দিন মাথাব্যথা)<br/>
-        <b>MED</b> ওষুধের নাম ও পরিমাণ (উদাহরণ: <b>MED</b> ORS 3, Paracetamol 10)
-      </p>
+      <div class="twoCol">
 
-      <p class="small muted">
-        (ডেমোর জন্য আমরা ওয়েব ব্যাকএন্ডে SMS endpoint তৈরি রেখেছি। Twilio যুক্ত করলে SMS কাজ করবে।)
-      </p>
+        <!-- LEFT SIDE: SMS Instructions -->
+        <div>
+          <p class="small">
+            SMS পাঠান:<br/>
+            <b>HELP</b> আপনার সমস্যা লিখে পাঠান (উদাহরণ: <b>HELP</b> জ্বর ৩ দিন মাথাব্যথা)<br/>
+            <b>MED</b> ওষুধের নাম ও পরিমাণ (উদাহরণ: <b>MED</b> ORS 3, Paracetamol 10)
+          </p>
+
+          <p class="small muted">
+            
+          </p>
+        </div>
+
+        <!-- RIGHT SIDE: Video -->
+        <div class="videoBox">
+          <div class="badge" style="margin-bottom:10px;">✅ SMS Tutorial</div>
+
+          <!-- ✅ Put your video here: frontend/assets/demo.mp4 -->
+          <video class="promoVideo" controls muted playsinline>
+            <source src="assets/demo.mp4" type="video/mp4">
+            
+          </video>
+
+          <div class="small muted" style="margin-top:8px;">
+            
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <div class="small muted">
