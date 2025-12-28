@@ -5,12 +5,10 @@ Hackathon solution
 
 
 
-# ShasthoBondhu – AI Doctor Care + Medicine Delivery (Web + SMS)
+### ShasthoBondhu – AI Doctor Care + Medicine Delivery (Web + SMS)
 
-## Overview
+### Overview
 **ShasthoBondhu** is a lightweight healthcare support platform for Bangladesh’s **hill tracts and rural areas**, where doctors, pharmacies, and internet access are limited. It provides **AI doctor guidance** and **medicine ordering & delivery**, through both **Web** and **SMS**.
-
----
 
 ## Key Features
 ### 1) AI Doctor Care (Web + SMS)
@@ -29,17 +27,13 @@ Orders appear in an **Admin Dashboard** where volunteers/NGOs can:
 - assign delivery person
 - update status (pending → delivered)
 
----
-
-## Offline SMS Support
+### Offline SMS Support
 An **Android phone acts as an SMS gateway**:
 - receives SMS from users
 - forwards to backend via Wi-Fi
 - sends reply SMS back
 
----
-
-## Tech Stack
+### Tech Stack
 - Frontend: HTML + CSS + JavaScript  
 - Backend: Node.js + Express  
 - AI: Perplexity API  
