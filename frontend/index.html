@@ -4,32 +4,46 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ShasthoBondhu</title>
+
+  <!-- ✅ Fonts for your design -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- ✅ Your new healthcare theme -->
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <header>
+  <header class="hero">
     <div class="container">
-      <h1>ShasthoBondhu</h1>
-      <div class="small">AI ডাক্তার পরামর্শ + ওষুধ ডেলিভারি (ওয়েব + SMS)</div>
+      <div class="heroTitle">ShasthoBondhu</div>
+      <div class="heroSub">
+        AI ডাক্তার পরামর্শ + ওষুধ ডেলিভারি (ওয়েব + SMS) <br />
+        পাহাড়ি অঞ্চল ও গ্রামীণ মানুষের জন্য কম ইন্টারনেটেও কাজ করবে
+      </div>
     </div>
   </header>
 
-  <div class="container">
+  <div class="container fadeInUp">
 
     <!-- AI Opinion -->
     <div class="card">
-      <h2>🩺 AI ডাক্তার পরামর্শ</h2>
+      <div class="cardTitle">
+        <h2>🩺 AI ডাক্তার পরামর্শ</h2>
+        <span class="badge">Bangla Input</span>
+      </div>
 
-      <label>আপনার সমস্যা (বাংলায় লিখুন)</label>
+      <label for="symptoms">আপনার সমস্যা (বাংলায় লিখুন)</label>
       <textarea id="symptoms" rows="5" placeholder="উদাহরণ: আমার ৩ দিন ধরে জ্বর, মাথাব্যথা এবং দুর্বলতা..."></textarea>
 
       <div class="row">
         <div>
-          <label>ফোন নম্বর (ঐচ্ছিক)</label>
+          <label for="phone">ফোন নম্বর (ঐচ্ছিক)</label>
           <input id="phone" placeholder="01XXXXXXXXX" />
         </div>
         <div>
-          <label>উপকারি তথ্য (ঐচ্ছিক)</label>
+          <label for="extra">উপকারি তথ্য (ঐচ্ছিক)</label>
           <input id="extra" placeholder="বয়স / গর্ভবতী / ডায়াবেটিস ইত্যাদি" />
         </div>
       </div>
@@ -41,33 +55,40 @@
       </p>
 
       <div id="aiResultWrap" style="display:none;">
-        <div class="badge">AI উত্তর</div>
-        <div id="aiResult" class="output"></div>
+        <div class="hr"></div>
+        <span class="badge">AI উত্তর</span>
+        <div id="aiResult" class="output" style="margin-top:10px;"></div>
       </div>
     </div>
 
     <!-- Medicine Order -->
     <div class="card">
-      <h2>💊 ওষুধ অর্ডার</h2>
-      <p class="small">নিরাপদ সাধারণ ওষুধ/সাপ্লাই তালিকা থেকে নির্বাচন করুন।</p>
+      <div class="cardTitle">
+        <h2>💊 ওষুধ অর্ডার</h2>
+        <span class="badge">Safe List</span>
+      </div>
+
+      <p class="small">
+        নিরাপদ সাধারণ ওষুধ/সাপ্লাই তালিকা থেকে নির্বাচন করুন।
+      </p>
 
       <div class="row">
         <div>
-          <label>নাম</label>
+          <label for="name">নাম</label>
           <input id="name" placeholder="আপনার নাম" />
         </div>
         <div>
-          <label>ফোন নম্বর</label>
+          <label for="orderPhone">ফোন নম্বর</label>
           <input id="orderPhone" placeholder="01XXXXXXXXX" />
         </div>
       </div>
 
-      <label>ঠিকানা / এলাকা</label>
+      <label for="address">ঠিকানা / এলাকা</label>
       <input id="address" placeholder="গ্রাম, ইউনিয়ন, উপজেলা, জেলা" />
 
       <div class="row">
         <div>
-          <label>ওষুধ/সাপ্লাই</label>
+          <label for="medName">ওষুধ/সাপ্লাই</label>
           <select id="medName">
             <option value="ORS">ORS (ওআরএস)</option>
             <option value="Paracetamol">Paracetamol</option>
@@ -78,12 +99,12 @@
           </select>
         </div>
         <div>
-          <label>পরিমাণ</label>
+          <label for="medQty">পরিমাণ</label>
           <input id="medQty" type="number" min="1" value="1" />
         </div>
       </div>
 
-      <button id="btnAdd">+ লিস্টে যোগ করুন</button>
+      <button id="btnAdd" class="secondary">+ লিস্টে যোগ করুন</button>
 
       <div id="cart" class="output" style="margin-top:12px;">(এখনো কিছু যোগ করা হয়নি)</div>
 
@@ -92,16 +113,26 @@
       <div id="orderMsg" class="small" style="margin-top:10px;"></div>
     </div>
 
+    <!-- SMS Info -->
     <div class="card">
-      <h2>📩 ইন্টারনেট নেই?</h2>
+      <div class="cardTitle">
+        <h2>📩 ইন্টারনেট নেই?</h2>
+        <span class="badge">SMS Mode</span>
+      </div>
+
       <p class="small">
         SMS পাঠান:<br/>
-        <b>HELP</b> আপনার সমস্যা লিখে পাঠান (উদাহরণ: HELP জ্বর ৩ দিন মাথাব্যথা)<br/>
-        <b>MED</b> ওষুধের নাম ও পরিমাণ (উদাহরণ: MED ORS 3, Paracetamol 10)
+        <b>HELP</b> আপনার সমস্যা লিখে পাঠান (উদাহরণ: <b>HELP</b> জ্বর ৩ দিন মাথাব্যথা)<br/>
+        <b>MED</b> ওষুধের নাম ও পরিমাণ (উদাহরণ: <b>MED</b> ORS 3, Paracetamol 10)
       </p>
-      <p class="small">
+
+      <p class="small muted">
         (ডেমোর জন্য আমরা ওয়েব ব্যাকএন্ডে SMS endpoint তৈরি রেখেছি। Twilio যুক্ত করলে SMS কাজ করবে।)
       </p>
+    </div>
+
+    <div class="small muted">
+      Admin Dashboard: <a href="admin.html"><b>admin.html</b></a>
     </div>
 
   </div>

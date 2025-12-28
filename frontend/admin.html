@@ -4,42 +4,40 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin - ShasthoBondhu</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Theme CSS -->
   <link rel="stylesheet" href="style.css" />
+
   <style>
     .tabs { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
-    .tabbtn { background:#e8f3ee; color:#064; padding:10px 12px; border-radius:10px; border:1px solid #cde7dc; }
-    .tabbtn.active { background:#0b5; color:#fff; border-color:#0b5; }
+    .tabbtn { background:#e8f3ee; color:#064; padding:10px 12px; border-radius:10px; border:1px solid #cde7dc; cursor:pointer; }
+    .tabbtn.active { background: #0b5; color: #fff; border-color:#0b5; }
     .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:10px 0; }
     .toolbar input, .toolbar select { max-width: 260px; margin:0; }
-    table { width:100%; border-collapse: collapse; overflow:hidden; border-radius:12px; }
-    th, td { border-bottom:1px solid #eee; padding:10px; text-align:left; vertical-align: top; font-size:14px; }
-    th { background:#f3f4f6; font-weight:700; }
-    .pill { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; }
-    .pill.red { background:#ffe5e5; color:#a40000; }
-    .pill.orange { background:#fff0d9; color:#8a4b00; }
-    .pill.green { background:#e9f8ef; color:#0a6; }
-    .pill.gray { background:#f2f2f2; color:#555; }
-    .btnSmall { padding:8px 10px; border-radius:10px; font-size:13px; }
-    .muted { color:#666; font-size:13px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:12px; }
     .wrap { white-space: pre-wrap; }
   </style>
 </head>
 
 <body>
-  <header>
+  <header class="hero">
     <div class="container">
-      <h1>Admin Dashboard</h1>
-      <div class="small">Doctor Requests + Medicine Orders (Web + SMS)</div>
+      <div class="heroTitle">Admin Dashboard</div>
+      <div class="heroSub">Doctor Requests + Medicine Orders (Web + SMS)</div>
     </div>
   </header>
 
-  <div class="container">
+  <div class="container fadeInUp">
 
     <div class="card">
       <div class="toolbar">
-        <button id="btnReload" class="btnSmall">Reload All</button>
-        <span class="muted">Backend: <span id="backendStatus">checking...</span></span>
+        <button id="btnReload" class="smallBtn">Reload All</button>
+        <span class="small">Backend: <b id="backendStatus">checking...</b></span>
       </div>
 
       <div class="tabs">
@@ -48,7 +46,7 @@
       </div>
     </div>
 
-    <!-- Doctor Requests Panel -->
+    <!-- Doctor Panel -->
     <div class="card" id="panelDoctor">
       <h2>🩺 Doctor Requests</h2>
 
@@ -61,13 +59,13 @@
           <option value="routine">Routine</option>
           <option value="self-care">Self-care</option>
         </select>
-        <button id="btnReloadDoctor" class="btnSmall">Reload</button>
+        <button id="btnReloadDoctor" class="smallBtn">Reload</button>
       </div>
 
-      <div class="muted" id="doctorCount"></div>
+      <div class="small muted" id="doctorCount"></div>
 
       <div style="overflow:auto;">
-        <table id="doctorTable">
+        <table>
           <thead>
             <tr>
               <th>Received</th>
@@ -98,13 +96,13 @@
           <option value="out-for-delivery">out-for-delivery</option>
           <option value="delivered">delivered</option>
         </select>
-        <button id="btnReloadOrders" class="btnSmall">Reload</button>
+        <button id="btnReloadOrders" class="smallBtn">Reload</button>
       </div>
 
-      <div class="muted" id="orderCount"></div>
+      <div class="small muted" id="orderCount"></div>
 
       <div style="overflow:auto;">
-        <table id="orderTable">
+        <table>
           <thead>
             <tr>
               <th>Received</th>
@@ -124,8 +122,12 @@
       </div>
 
       <p class="small">
-        Tip: You can change status and assigned person, then click “Update”.
+        Tip: Change status & assigned person, then click “Update”.
       </p>
+    </div>
+
+    <div class="small muted">
+      Back to Patient Site: <a href="index.html"><b>index.html</b></a>
     </div>
 
   </div>

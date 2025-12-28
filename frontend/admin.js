@@ -22,15 +22,14 @@ const orderStatusFilter = document.getElementById("orderStatusFilter");
 const orderBody = document.getElementById("orderBody");
 const orderCount = document.getElementById("orderCount");
 
-// Data cache
 let doctorRequests = [];
 let orders = [];
 
-// ---------- Helpers ----------
+// Helpers
 function formatDateTime(iso) {
   try {
     const d = new Date(iso);
-    return d.toLocaleString("en-GB"); // DD/MM/YYYY, HH:MM:SS
+    return d.toLocaleString("en-GB");
   } catch {
     return iso || "-";
   }
@@ -46,34 +45,24 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
-/**
- * ✅ Now supports BOTH:
- * - normalized keys (emergency, urgent, routine, self-care)
- * - old raw text (জরুরি, urgent, etc.)
- */
 function urgencyKey(urgencyText = "") {
   const u = (urgencyText || "").toLowerCase().trim();
-
-  // ✅ normalized keys
   if (u === "emergency") return "emergency";
   if (u === "urgent") return "urgent";
   if (u === "routine") return "routine";
   if (u === "self-care") return "self-care";
-
-  // ✅ fallback detection for old data
   if (u.includes("emergency") || u.includes("জরুরি")) return "emergency";
   if (u.includes("urgent") || u.includes("দ্রুত")) return "urgent";
   if (u.includes("routine") || u.includes("সাধারণ")) return "routine";
   if (u.includes("self-care") || u.includes("ঘরে")) return "self-care";
-
   return "unknown";
 }
 
 function urgencyPill(urgencyText) {
   const key = urgencyKey(urgencyText);
-  if (key === "emergency") return `<span class="pill red">🔴 জরুরি (Emergency)</span>`;
-  if (key === "urgent") return `<span class="pill orange">🟠 দ্রুত ডাক্তার (Urgent)</span>`;
-  if (key === "routine") return `<span class="pill green">🟢 সাধারণ (Routine)</span>`;
+  if (key === "emergency") return `<span class="pill red">🔴 জরুরি</span>`;
+  if (key === "urgent") return `<span class="pill orange">🟠 দ্রুত ডাক্তার</span>`;
+  if (key === "routine") return `<span class="pill green">🟢 সাধারণ</span>`;
   if (key === "self-care") return `<span class="pill gray">✅ ঘরে চিকিৎসা</span>`;
   return `<span class="pill gray">⚪ Unknown</span>`;
 }
@@ -96,7 +85,7 @@ async function apiPost(path, payload) {
   return resp.json();
 }
 
-// ---------- Tabs ----------
+// Tabs
 tabDoctor.addEventListener("click", () => {
   tabDoctor.classList.add("active");
   tabOrders.classList.remove("active");
@@ -111,7 +100,7 @@ tabOrders.addEventListener("click", () => {
   panelDoctor.style.display = "none";
 });
 
-// ---------- Backend status ----------
+// Backend status
 async function checkBackend() {
   try {
     const data = await apiGet("/api/health");
@@ -121,7 +110,7 @@ async function checkBackend() {
   }
 }
 
-// ---------- Doctor Requests ----------
+// Doctor Requests
 function renderDoctorTable() {
   const q = doctorSearch.value.trim();
   const f = doctorUrgencyFilter.value;
@@ -148,26 +137,20 @@ function renderDoctorTable() {
     return;
   }
 
-  doctorBody.innerHTML = filtered.slice(0, 50).map(r => {
-    return `
-      <tr>
-        <td>${escapeHtml(formatDateTime(r.created_at))}</td>
-        <td>${escapeHtml(r.phone || "-")}</td>
-        <td>
-          ${urgencyPill(r.urgency || "")}
-          <div class="muted">stored: ${escapeHtml(r.urgency || "")}</div>
-        </td>
-        <td class="wrap">${escapeHtml(r.symptoms || "")}</td>
-        <td class="wrap">${escapeHtml(r.ai_reply || "")}</td>
-        <td class="mono">${escapeHtml(r.id)}</td>
-      </tr>
-    `;
-  }).join("");
+  doctorBody.innerHTML = filtered.slice(0, 50).map(r => `
+    <tr>
+      <td>${escapeHtml(formatDateTime(r.created_at))}</td>
+      <td>${escapeHtml(r.phone || "-")}</td>
+      <td>${urgencyPill(r.urgency || "")}</td>
+      <td class="wrap">${escapeHtml(r.symptoms || "")}</td>
+      <td class="wrap">${escapeHtml(r.ai_reply || "")}</td>
+      <td class="mono">${escapeHtml(r.id)}</td>
+    </tr>
+  `).join("");
 }
 
 async function loadDoctorRequests() {
   doctorBody.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`;
-
   try {
     const data = await apiGet("/api/admin/doctor-requests");
     if (!data.ok) throw new Error("Failed to load doctor requests");
@@ -182,7 +165,7 @@ doctorSearch.addEventListener("input", renderDoctorTable);
 doctorUrgencyFilter.addEventListener("change", renderDoctorTable);
 btnReloadDoctor.addEventListener("click", loadDoctorRequests);
 
-// ---------- Orders ----------
+// Orders
 function renderOrdersTable() {
   const q = orderSearch.value.trim();
   const statusF = orderStatusFilter.value;
@@ -217,12 +200,13 @@ function renderOrdersTable() {
       <tr>
         <td>${escapeHtml(formatDateTime(o.created_at))}</td>
         <td>
-          <div><b>${escapeHtml(o.name || "-")}</b></div>
+          <b>${escapeHtml(o.name || "-")}</b>
           <div class="muted">${escapeHtml(o.phone || "-")}</div>
           <div class="muted">Source: ${escapeHtml(o.source || "-")}</div>
         </td>
         <td class="wrap">${escapeHtml(o.address || "")}</td>
         <td class="wrap">${escapeHtml(itemsText)}</td>
+
         <td>
           <select data-order-id="${escapeHtml(o.id)}" class="statusSelect">
             <option value="pending" ${o.status === "pending" ? "selected" : ""}>pending</option>
@@ -231,18 +215,22 @@ function renderOrdersTable() {
             <option value="delivered" ${o.status === "delivered" ? "selected" : ""}>delivered</option>
           </select>
         </td>
+
         <td>
           <input data-order-id="${escapeHtml(o.id)}" class="assignInput" value="${escapeHtml(assigned)}" placeholder="Delivery person" />
         </td>
+
         <td>
-          <button class="btnSmall updateBtn" data-order-id="${escapeHtml(o.id)}">Update</button>
+          <button class="smallBtn updateBtn" data-order-id="${escapeHtml(o.id)}">Update</button>
           <div class="muted" id="msg-${escapeHtml(o.id)}"></div>
         </td>
+
         <td class="mono">${escapeHtml(o.id)}</td>
       </tr>
     `;
   }).join("");
 
+  // ✅ IMPORTANT: Attach event listeners AFTER rendering
   document.querySelectorAll(".updateBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const orderId = btn.getAttribute("data-order-id");
@@ -262,8 +250,10 @@ function renderOrdersTable() {
         if (!data.ok) throw new Error(data.error || "Update failed");
         msgEl.textContent = "✅ Updated";
 
+        // ✅ Update cache
         const idx = orders.findIndex(x => x.id === orderId);
         if (idx !== -1) orders[idx] = data.updated;
+
       } catch (err) {
         msgEl.textContent = "❌ " + err.message;
       }
@@ -273,7 +263,6 @@ function renderOrdersTable() {
 
 async function loadOrders() {
   orderBody.innerHTML = `<tr><td colspan="8">Loading...</td></tr>`;
-
   try {
     const data = await apiGet("/api/admin/orders");
     if (!data.ok) throw new Error("Failed to load orders");
@@ -288,14 +277,14 @@ orderSearch.addEventListener("input", renderOrdersTable);
 orderStatusFilter.addEventListener("change", renderOrdersTable);
 btnReloadOrders.addEventListener("click", loadOrders);
 
-// ---------- Reload All ----------
+// Reload all
 btnReload.addEventListener("click", async () => {
   await checkBackend();
   await loadDoctorRequests();
   await loadOrders();
 });
 
-// ---------- Initial load ----------
+// Init
 (async function init() {
   await checkBackend();
   await loadDoctorRequests();
