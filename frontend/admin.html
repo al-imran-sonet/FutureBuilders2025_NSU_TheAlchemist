@@ -5,27 +5,127 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin - ShasthoBondhu</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .tabs { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    .tabbtn { background:#e8f3ee; color:#064; padding:10px 12px; border-radius:10px; border:1px solid #cde7dc; }
+    .tabbtn.active { background:#0b5; color:#fff; border-color:#0b5; }
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:10px 0; }
+    .toolbar input, .toolbar select { max-width: 260px; margin:0; }
+    table { width:100%; border-collapse: collapse; overflow:hidden; border-radius:12px; }
+    th, td { border-bottom:1px solid #eee; padding:10px; text-align:left; vertical-align: top; font-size:14px; }
+    th { background:#f3f4f6; font-weight:700; }
+    .pill { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; }
+    .pill.red { background:#ffe5e5; color:#a40000; }
+    .pill.orange { background:#fff0d9; color:#8a4b00; }
+    .pill.green { background:#e9f8ef; color:#0a6; }
+    .pill.gray { background:#f2f2f2; color:#555; }
+    .btnSmall { padding:8px 10px; border-radius:10px; font-size:13px; }
+    .muted { color:#666; font-size:13px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
+    .wrap { white-space: pre-wrap; }
+  </style>
 </head>
+
 <body>
   <header>
     <div class="container">
       <h1>Admin Dashboard</h1>
-      <div class="small">Doctor Requests + Medicine Orders</div>
+      <div class="small">Doctor Requests + Medicine Orders (Web + SMS)</div>
     </div>
   </header>
 
   <div class="container">
 
     <div class="card">
-      <h2>🩺 Doctor Requests</h2>
-      <button id="btnLoadDoctor">Reload</button>
-      <div id="doctorList" class="output" style="margin-top:12px;">Loading...</div>
+      <div class="toolbar">
+        <button id="btnReload" class="btnSmall">Reload All</button>
+        <span class="muted">Backend: <span id="backendStatus">checking...</span></span>
+      </div>
+
+      <div class="tabs">
+        <button class="tabbtn active" id="tabDoctor">🩺 Doctor Requests</button>
+        <button class="tabbtn" id="tabOrders">💊 Medicine Orders</button>
+      </div>
     </div>
 
-    <div class="card">
+    <!-- Doctor Requests Panel -->
+    <div class="card" id="panelDoctor">
+      <h2>🩺 Doctor Requests</h2>
+
+      <div class="toolbar">
+        <input id="doctorSearch" placeholder="Search by phone / id / symptoms..." />
+        <select id="doctorUrgencyFilter">
+          <option value="all">All Urgency</option>
+          <option value="emergency">Emergency</option>
+          <option value="urgent">Urgent</option>
+          <option value="routine">Routine</option>
+          <option value="self-care">Self-care</option>
+        </select>
+        <button id="btnReloadDoctor" class="btnSmall">Reload</button>
+      </div>
+
+      <div class="muted" id="doctorCount"></div>
+
+      <div style="overflow:auto;">
+        <table id="doctorTable">
+          <thead>
+            <tr>
+              <th>Received</th>
+              <th>Phone</th>
+              <th>Urgency</th>
+              <th>Symptoms</th>
+              <th>AI Reply</th>
+              <th>ID</th>
+            </tr>
+          </thead>
+          <tbody id="doctorBody">
+            <tr><td colspan="6">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Orders Panel -->
+    <div class="card" id="panelOrders" style="display:none;">
       <h2>💊 Medicine Orders</h2>
-      <button id="btnLoadOrders">Reload</button>
-      <div id="orderList" class="output" style="margin-top:12px;">Loading...</div>
+
+      <div class="toolbar">
+        <input id="orderSearch" placeholder="Search by phone / id / address..." />
+        <select id="orderStatusFilter">
+          <option value="all">All Status</option>
+          <option value="pending">pending</option>
+          <option value="confirmed">confirmed</option>
+          <option value="out-for-delivery">out-for-delivery</option>
+          <option value="delivered">delivered</option>
+        </select>
+        <button id="btnReloadOrders" class="btnSmall">Reload</button>
+      </div>
+
+      <div class="muted" id="orderCount"></div>
+
+      <div style="overflow:auto;">
+        <table id="orderTable">
+          <thead>
+            <tr>
+              <th>Received</th>
+              <th>Customer</th>
+              <th>Address</th>
+              <th>Items</th>
+              <th>Status</th>
+              <th>Assign</th>
+              <th>Update</th>
+              <th>ID</th>
+            </tr>
+          </thead>
+          <tbody id="orderBody">
+            <tr><td colspan="8">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="small">
+        Tip: You can change status and assigned person, then click “Update”.
+      </p>
     </div>
 
   </div>

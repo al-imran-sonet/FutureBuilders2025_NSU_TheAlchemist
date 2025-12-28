@@ -14,9 +14,22 @@ app.use(express.json());
 const DOCTOR_FILE = path.join(__dirname, "data", "doctor_requests.json");
 const ORDER_FILE = path.join(__dirname, "data", "medicine_orders.json");
 
-// Simple helper
+// Generate UUID
 function id() {
   return crypto.randomUUID();
+}
+
+// ✅ Extract urgency from AI reply text
+function extractUrgency(aiText) {
+  // Expected line: "জরুরিতা: জরুরি (Emergency)"
+  const lines = (aiText || "").split("\n").map(x => x.trim());
+  const line = lines.find(l => l.startsWith("জরুরিতা"));
+  if (!line) return "Unknown";
+
+  return line
+    .replace("জরুরিতা:", "")
+    .replace("জরুরিতা -", "")
+    .trim();
 }
 
 // ✅ Health check
@@ -30,10 +43,11 @@ app.post("/api/ai-opinion", async (req, res) => {
     const { symptomsBn, phone } = req.body;
 
     if (!symptomsBn || symptomsBn.trim().length < 5) {
-      return res.status(400).json({ error: "Please provide symptoms in Bangla." });
+      return res.status(400).json({ ok: false, error: "Please provide symptoms in Bangla." });
     }
 
     const aiReply = await getAiDoctorOpinion({ symptomsBn });
+    const urgency = extractUrgency(aiReply);
 
     const request = {
       id: id(),
@@ -41,6 +55,10 @@ app.post("/api/ai-opinion", async (req, res) => {
       phone: phone || null,
       symptoms: symptomsBn,
       ai_reply: aiReply,
+
+      // ✅ New field for admin dashboard filtering
+      urgency,
+
       created_at: new Date().toISOString()
     };
 
@@ -48,10 +66,10 @@ app.post("/api/ai-opinion", async (req, res) => {
     requests.unshift(request);
     writeJson(DOCTOR_FILE, requests);
 
-    res.json({ ok: true, aiReply, requestId: request.id });
+    res.json({ ok: true, aiReply, requestId: request.id, urgency });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "AI service failed.", details: err.message });
+    res.status(500).json({ ok: false, error: "AI service failed.", details: err.message });
   }
 });
 
@@ -61,7 +79,7 @@ app.post("/api/order", (req, res) => {
     const { name, phone, address, items } = req.body;
 
     if (!phone || !address || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: "Missing required fields." });
+      return res.status(400).json({ ok: false, error: "Missing required fields." });
     }
 
     const order = {
@@ -70,7 +88,7 @@ app.post("/api/order", (req, res) => {
       name: name || null,
       phone,
       address,
-      items, // [{name, qty}]
+      items,
       status: "pending",
       assigned_to: null,
       created_at: new Date().toISOString()
@@ -83,7 +101,7 @@ app.post("/api/order", (req, res) => {
     res.json({ ok: true, orderId: order.id });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Order failed." });
+    res.status(500).json({ ok: false, error: "Order failed." });
   }
 });
 
@@ -101,29 +119,28 @@ app.get("/api/admin/orders", (req, res) => {
 
 // ✅ Admin: update order status/assignment
 app.post("/api/admin/orders/update", (req, res) => {
-  const { id, status, assigned_to } = req.body;
+  try {
+    const { id, status, assigned_to } = req.body;
 
-  if (!id) return res.status(400).json({ error: "Missing order id." });
+    if (!id) return res.status(400).json({ ok: false, error: "Missing order id." });
 
-  const orders = readJson(ORDER_FILE, []);
-  const idx = orders.findIndex(o => o.id === id);
+    const orders = readJson(ORDER_FILE, []);
+    const idx = orders.findIndex(o => o.id === id);
 
-  if (idx === -1) return res.status(404).json({ error: "Order not found." });
+    if (idx === -1) return res.status(404).json({ ok: false, error: "Order not found." });
 
-  if (status) orders[idx].status = status;
-  if (assigned_to !== undefined) orders[idx].assigned_to = assigned_to;
+    if (status) orders[idx].status = status;
+    if (assigned_to !== undefined) orders[idx].assigned_to = assigned_to;
 
-  writeJson(ORDER_FILE, orders);
-  res.json({ ok: true, updated: orders[idx] });
+    writeJson(ORDER_FILE, orders);
+    res.json({ ok: true, updated: orders[idx] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: "Update failed." });
+  }
 });
 
-/**
- * ✅ SMS endpoint placeholder (connect Twilio later)
- * If you integrate Twilio, their webhook will POST here with:
- * - From: phone number
- * - Body: message text
- * You will parse HELP / MED and respond.
- */
+// ✅ SMS endpoint placeholder
 app.post("/api/sms", async (req, res) => {
   res.json({
     ok: true,
