@@ -19,17 +19,33 @@ function id() {
   return crypto.randomUUID();
 }
 
-// ✅ Extract urgency from AI reply text
-function extractUrgency(aiText) {
-  // Expected line: "জরুরিতা: জরুরি (Emergency)"
+/**
+ * ✅ Extract urgency from AI output and normalize to:
+ * emergency | urgent | routine | self-care | unknown
+ *
+ * This guarantees admin filters never show Unknown for valid answers.
+ */
+function extractUrgencyNormalized(aiText) {
   const lines = (aiText || "").split("\n").map(x => x.trim());
   const line = lines.find(l => l.startsWith("জরুরিতা"));
-  if (!line) return "Unknown";
+  if (!line) return "unknown";
 
-  return line
+  const value = line
     .replace("জরুরিতা:", "")
     .replace("জরুরিতা -", "")
-    .trim();
+    .trim()
+    .toLowerCase();
+
+  // ✅ Normal detections (Bangla + English)
+  if (value.includes("emergency") || value.includes("জরুরি")) return "emergency";
+  if (value.includes("urgent") || value.includes("দ্রুত")) return "urgent";
+  if (value.includes("routine") || value.includes("সাধারণ")) return "routine";
+  if (value.includes("self-care") || value.includes("ঘরে")) return "self-care";
+
+  // ✅ Extra Bangla detection (if AI uses different wording)
+  if (value.includes("অবিলম্বে") || value.includes("হাসপাতাল")) return "emergency";
+
+  return "unknown";
 }
 
 // ✅ Health check
@@ -47,7 +63,9 @@ app.post("/api/ai-opinion", async (req, res) => {
     }
 
     const aiReply = await getAiDoctorOpinion({ symptomsBn });
-    const urgency = extractUrgency(aiReply);
+
+    // ✅ Normalized urgency key stored
+    const urgency = extractUrgencyNormalized(aiReply);
 
     const request = {
       id: id(),
@@ -56,7 +74,7 @@ app.post("/api/ai-opinion", async (req, res) => {
       symptoms: symptomsBn,
       ai_reply: aiReply,
 
-      // ✅ New field for admin dashboard filtering
+      // ✅ "emergency" | "urgent" | "routine" | "self-care" | "unknown"
       urgency,
 
       created_at: new Date().toISOString()
