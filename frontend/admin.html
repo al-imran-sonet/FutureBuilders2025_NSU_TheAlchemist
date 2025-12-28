@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - ShasthoBondhu</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Admin Dashboard</h1>
+      <div class="small">Doctor Requests + Medicine Orders</div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <div class="card">
+      <h2>🩺 Doctor Requests</h2>
+      <button id="btnLoadDoctor">Reload</button>
+      <div id="doctorList" class="output" style="margin-top:12px;">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>💊 Medicine Orders</h2>
+      <button id="btnLoadOrders">Reload</button>
+      <div id="orderList" class="output" style="margin-top:12px;">Loading...</div>
+    </div>
+
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
